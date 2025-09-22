@@ -53,5 +53,10 @@ public class Pagamento {
    private Long pedidoId;
 
    @NotNull
-   private Long formaDePagamento;
+   @JoinColumn(name = "forma_de_pagamento_id")
+   @Enumerated(EnumType.STRING)
+   //transformando o formaDePagamento em ENUM do tipo STRING para aderir às boas práticas em serviços de pagamento.
+   private FormaPagamento formaDePagamento;
+
+
 }
