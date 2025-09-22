@@ -1,5 +1,6 @@
 package br.com.getfood.pagamentos;
 
+import com.netflix.discovery.EurekaNamespace;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
