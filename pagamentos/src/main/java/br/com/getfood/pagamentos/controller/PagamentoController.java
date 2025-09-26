@@ -61,4 +61,9 @@ public class PagamentoController {
         return String.format("Requisição respondida pela instância executando na porta %s", porta);
 
     }
+
+    @PatchMapping("/{id}/confirmar")
+    public void confirmarPagamento(@PathVariable @NotNull Long id) {
+        pagamentoService.confirmarPagamento(id);
+    }
 }

@@ -1,6 +1,7 @@
 package br.com.getfood.pagamentos.service;
 
 import br.com.getfood.pagamentos.dto.PagamentoDTO;
+import br.com.getfood.pagamentos.http.PedidoClient;
 import br.com.getfood.pagamentos.model.Pagamento;
 import br.com.getfood.pagamentos.model.Status;
 import br.com.getfood.pagamentos.repository.PagamentoRepository;
@@ -9,7 +10,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
 public class PagamentoService {
@@ -19,6 +24,9 @@ public class PagamentoService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PedidoClient pedidoClient;
 
     public Page<PagamentoDTO> obterTodos(Pageable paginacao) {
         return repository
@@ -57,5 +65,24 @@ public class PagamentoService {
 
     public void excluirPagamento(Long id) {
         repository.deleteById(id);
+    }
+
+    public void confirmarPagamento (Long id) {
+        Pagamento pagamento = repository
+                .findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Pagamento não encontrado por esse id."));
+
+        if (pagamento.getStatus().equals(Status.CONFIRMADO)){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Pagamento já foi confirmado.");
+        }
+
+        pagamento.setStatus(Status.CONFIRMADO);
+        repository.save(pagamento);
+        pedidoClient.atualizaPagamento(pagamento.getPedidoId());
+
+
+
     }
 }
